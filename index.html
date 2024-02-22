@@ -1,16 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Backgammon</title>
     <link href="Styles/TestStyle.css" rel="stylesheet"/>
-	<link href="Styles/sweetalert.css" rel="stylesheet"/>
-	
-	<script src="scripts/lib/kinetic.js"></script>
+    <link href="Styles/sweetalert.css" rel="stylesheet"/>
+
+    <script src="scripts/lib/kinetic.js"></script>
 
     <script src="scripts/lib/jquery-2.1.4.js"></script>
-    
-	<script src="scripts/lib/sweetalert.min.js"></script>
-	
+
+    <script src="scripts/lib/sweetalert.min.js"></script>
 </head>
 <body>
 <svg width="1359" height="639" id="theSvg">
@@ -25,7 +24,7 @@
     <image id="boardImage" xlink:href="Images/Board800x600.png" x="10" y="10" width="800" height="600"/>
     <text class="textGoodBye" id="textThanks" x="375" y="300" fill="rgb(199, 199, 199)"></text>
     <text class="textGoodBye" id="textGoodbye" x="530" y="400" fill="rgb(199, 199, 199)"></text>
-    <text onclick="play()" class="button" id="textPlay" x="579" y="206">Play</text>
+    <text class="button" onclick="play()" id="textPlay" x="579" y="206">Play</text>
     <text id="firstPlayerText" x="245" y="206" fill="rgb(199, 199, 199)">Who is playing White?</text>
     <text id="secondPlayerText" x="259" y="206" fill="rgb(199, 199, 199)">Who is playing Black?</text>
     <foreignObject x="472" y="289" width="500" height="550">
@@ -49,10 +48,36 @@
     <img id="dice4"/>
 </div>
 
+<input type="button" class="blueButton" value="WAGER" onclick="displayPopup()">
+
+<script>
+  function displayPopup(){
+    var popup = document.createElement('div')
+    popup.innerHTML = '<p><center> | Straightline | moneyline | spread total | parlay | </center></p>'
+    popup.style.backgroundColor = 'white'
+    popup.style.border = '1px solid black'
+    popup.style.padding = '20px'
+    popup.style.width = '300px'
+    popup.style.position = 'fixed'
+    popup.style.right = '20px'
+    popup.style.top = '50%'
+    popup.style.transform = 'translateY(-50%)'
+    popup.style.zIndex = '1000'
+    document.body.appendChild(popup)
+
+    setTimeout(function(){
+      document.body.removeChild(popup)
+    }, 5000)
+  }
+</script>
+
 <script src="scripts/MenuScripts.js"></script>
 <script src="scripts/GameObjects.js"></script>
 <script src="scripts/GameDraw.js"></script>
 <script src="scripts/GameEngine.js"></script>
 <script src="scripts/GameEntryPoint.js"></script>
+
+<iframe id="video-chat" src="https://brie.fi/ng/single-frame-18?audio=1&video=1&fs=0&invite=0&prefs=0&share=0&chat=0" allow="camera; microphone; fullscreen; speaker; display-capture" style="position: fixed; top: 50%; right: 20px; transform: translateY(-50%);"></iframe>
+
 </body>
 </html>
