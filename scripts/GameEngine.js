@@ -104,7 +104,7 @@ var GameEngine = (function () {
         }
         if (dices.numbers.length === 0) { // because when clicked without dices checkIfPlayerCanExtractPieces throws
             swal({
-                title: 'Roll dices first!',
+                title: '[ Player ] Roll dices first to begin the game!',
                 timer: 1500,
                 showConfirmButton: false
             });
