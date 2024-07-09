@@ -78,6 +78,28 @@
 <script src="scripts/GameEntryPoint.js"></script>
 
 <iframe id="video-chat" src="https://brie.fi/ng/single-frame-18?audio=1&video=1&fs=0&invite=0&prefs=0&share=0&chat=1" allow="camera; microphone; fullscreen; speaker; display-capture" style="position: fixed; top: 20%; right: -5%; transform: translateY(-50%); z-index: 9999;"></iframe>
-
+<body>
+    <!-- ... existing code ... -->
+    <div id="instructions-popup" class="popup hide">
+        <div class="popup-content">
+            <span id="close-popup" class="close">&times;</span>
+            <h2>Instructions</h2>
+            <p>Follow these steps to play Backgammon:</p>
+            <ol>
+                <li>Each player rolls one die, and the player with the higher number goes first. They use the numbers on both dice for their first move.</li>
+                <li>Players take turns rolling two dice and moving their pieces according to the numbers rolled.</li>
+                <li>Pieces move in a counterclockwise direction from the player's starting point.</li>
+                <li>A piece can only move to an open point, which is one that is not occupied by two or more of the opponent's pieces.</li>
+                <li>If a piece lands on a point occupied by a single opponent's piece, the opponent's piece is "hit" and placed on the bar.</li>
+                <li>A player must move all their pieces off the bar before making any other moves.</li>
+                <li>The objective is to move all your pieces into your home board and then bear them off the board.</li>
+                <li>The first player to bear off all their pieces wins the game.</li>
+            </ol>
+            <p>In the video chat, there's a chat option available for communication.</p>
+        </div>
+    </div>
+    <button id="instructions-button">Instructions</button>
+    <!-- ... existing code ... -->
+</body>
 </body>
 </html>
