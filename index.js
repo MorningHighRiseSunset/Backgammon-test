@@ -78,6 +78,7 @@ var Board = {
         document.body.style.backgroundColor = this.playerTurn 
             ? getComputedStyle(document.documentElement).getPropertyValue('--white-color')
             : getComputedStyle(document.documentElement).getPropertyValue('--black-color');
+        
         var turn = this.playerTurn ? "item white" : "item black";
         var items = document.getElementsByClassName("item");
         for (var i = 0; i < items.length; i++) {
@@ -97,6 +98,9 @@ var Board = {
                 }
             }
         }
+
+        // Update the turn title
+        document.getElementById("turn-title").innerText = this.playerTurn ? "White's Turn" : "Black's Turn";
     },
     
     throwDices: function() {
@@ -132,6 +136,19 @@ var Board = {
         return tmpSum == (this.playerTurn ? this.whiteScore : this.blackScore) ? true : false;
     },
     
+    checkWin: function() {
+        var totalPieces = 15; // Assuming each player starts with 15 pieces
+        if (this.whiteOut === totalPieces) {
+            console.log("White wins!");
+            alert("White wins!");
+            // Handle end of game logic
+        } else if (this.blackOut === totalPieces) {
+            console.log("Black wins!");
+            alert("Black wins!");
+            // Handle end of game logic
+        }
+    },
+    
     interactBoard: function() {
         var dragged;
         var self = this;
@@ -141,10 +158,9 @@ var Board = {
         document.addEventListener("dragstart", function(event) {
             if (event.target.parentNode) { // Added check for parentNode
                 var currentLine = event.target.parentNode.getAttribute("id").split("-")[1];
-                // ... existing code ...
             }
-            dragged = event.target; // ... existing code ...
-            var currentLine = event.target.parentNode.getAttribute("id").split("-")[1]; // ... existing code ...
+            dragged = event.target;
+            var currentLine = event.target.parentNode.getAttribute("id").split("-")[1];
             
             if (self.whiteOut && self.playerTurn) currentLine = 25;
             if (self.blackOut && !self.playerTurn) currentLine = 0;
@@ -243,66 +259,84 @@ var Board = {
             if (event.target.getAttribute("moveTarget") == "true") {
                 var targetIndex = parseInt(event.target.getAttribute("id").split("-")[1]) - 1;
 
-                switch (event.target.getAttribute("targetVal")) {
-                    case "0": { break; }
-                    case "1": { self.firstDice = 0; break; }
-                    case "2": { self.secondDice = 0; break; }
-                    case "3": { self.firstDice = 0; self.secondDice = 0; break; }
-                    case "4": { self.doubleCounter--; break; }
-                    case "5": { self.doubleCounter -= 2; break; }
-                    case "6": { self.doubleCounter -= 3; break; }
-                    case "7": { self.doubleCounter -= 4; break; }
-                    default: { break; }
-                }
-
-                // Reset doubleCounter if it goes below 0
-                if (self.doubleCounter < 0) {
-                    self.doubleCounter = 0;
-                }
-
-                // handling entering
-                var enteringFlag = false; // flag for resetting draggable attr if dice left after entering 
-                if (self.whiteOut && self.playerTurn) {
-                    self.whiteOut--;
-                    if (!self.whiteOut) enteringFlag = true;
-                } else if (self.blackOut && !self.playerTurn) {
-                    self.blackOut--;
-                    if (!self.blackOut) enteringFlag = true;
-                } else {
-                    if (self.boardState[parseInt(dragged.parentNode.getAttribute("id").split("-")[1] - 1)]) {
-                        self.boardState[parseInt(dragged.parentNode.getAttribute("id").split("-")[1] - 1)][0]--;
+                // Check if the player can bear off
+                if (self.playerTurn && self.checkBearing()) {
+                    // If the piece is in the home area, allow bearing off
+                    if (targetIndex < 6) { // Assuming the last 6 positions are the home area for white
+                        self.boardState[targetIndex][0]--; // Remove the piece from the board
+                        self.whiteOut++; // Increment the whiteOut counter
+                        console.log("White piece borne off from position: " + targetIndex);
+                    } else if (targetIndex >= 18) { // Assuming the first 6 positions are the home area for black
+                        self.boardState[targetIndex][0]--; // Remove the piece from the board
+                        self.blackOut++; // Increment the blackOut counter
+                        console.log("Black piece borne off from position: " + targetIndex);
                     }
-                }
-                dragged.parentNode.removeChild(dragged);
+                } else {
+                    // Existing logic for moving pieces
+                    switch (event.target.getAttribute("targetVal")) {
+                        case "0": { break; }
+                        case "1": { self.firstDice = 0; break; }
+                        case "2": { self.secondDice = 0; break; }
+                        case "3": { self.firstDice = 0; self.secondDice = 0; break; }
+                        case "4": { self.doubleCounter--; break; }
+                        case "5": { self.doubleCounter -= 2; break; }
+                        case "6": { self.doubleCounter -= 3; break; }
+                        case "7": { self.doubleCounter -= 4; break; }
+                        default: { break; }
+                    }
 
-                // handling blot hitting
-                if (self.boardState[targetIndex] && self.boardState[targetIndex][0] == 1 && self.boardState[targetIndex][1] == !self.playerTurn) {
-                    var tmp = event.target.childNodes[0];
-                    event.target.removeChild(tmp);
-                    document.getElementById("board-bar").appendChild(tmp);
-                    self.boardState[targetIndex][0] = 0;
-                    self.playerTurn ? self.blackOut++ : self.whiteOut++;
+                    // Reset doubleCounter if it goes below 0
+                    if (self.doubleCounter < 0) {
+                        self.doubleCounter = 0;
+                    }
+
+                    // handling entering
+                    var enteringFlag = false; // flag for resetting draggable attr if dice left after entering 
+                    if (self.whiteOut && self.playerTurn) {
+                        self.whiteOut--;
+                        if (!self.whiteOut) enteringFlag = true;
+                    } else if (self.blackOut && !self.playerTurn) {
+                        self.blackOut--;
+                        if (!self.blackOut) enteringFlag = true;
+                    } else {
+                        if (self.boardState[parseInt(dragged.parentNode.getAttribute("id").split("-")[1] - 1)]) {
+                            self.boardState[parseInt(dragged.parentNode.getAttribute("id").split("-")[1] - 1)][0]--;
+                        }
+                    }
+                    dragged.parentNode.removeChild(dragged);
+
+                    // handling blot hitting
+                    if (self.boardState[targetIndex] && self.boardState[targetIndex][0] == 1 && self.boardState[targetIndex][1] == !self.playerTurn) {
+                        var tmp = event.target.childNodes[0];
+                        event.target.removeChild(tmp);
+                        document.getElementById("board-bar").appendChild(tmp);
+                        self.boardState[targetIndex][0] = 0;
+                        self.playerTurn ? self.blackOut++ : self.whiteOut++;
+                    }
+
+                    // Ensure targetIndex is valid before accessing
+                    if (self.boardState[targetIndex]) {
+                        self.boardState[targetIndex][0]++;
+                        self.boardState[targetIndex][1] = self.playerTurn ? 1 : 0;
+                    }
+                    event.target.appendChild(dragged);
+                    console.log(self);
+                }
+                
+                // reset targets
+                var targets = document.querySelectorAll('[moveTarget="true"]');
+                for (var i = 0; i < targets.length; i++) {
+                    targets[i].removeAttribute("moveTarget");
+                    targets[i].removeAttribute("onTarget");
+                    targets[i].removeAttribute("targetVal");
+                }
+                if ((self.firstDice == 0 && self.secondDice == 0) || (self.isDouble && self.doubleCounter === 0)) self.throwDices();
+                else if (enteringFlag) {
+                    self.assignTurn();
                 }
 
-                // Ensure targetIndex is valid before accessing
-                if (self.boardState[targetIndex]) {
-                    self.boardState[targetIndex][0]++;
-                    self.boardState[targetIndex][1] = self.playerTurn ? 1 : 0;
-                }
-                event.target.appendChild(dragged);
-                console.log(self);
-            }
-            
-            // reset targets
-            var targets = document.querySelectorAll('[moveTarget="true"]');
-            for (var i = 0; i < targets.length; i++) {
-                targets[i].removeAttribute("moveTarget");
-                targets[i].removeAttribute("onTarget");
-                targets[i].removeAttribute("targetVal");
-            }
-            if ((self.firstDice == 0 && self.secondDice == 0) || (self.isDouble && self.doubleCounter === 0)) self.throwDices();
-            else if (enteringFlag) {
-                self.assignTurn();
+                // Check for win condition
+                self.checkWin();
             }
         }, false);
     }
@@ -317,9 +351,7 @@ ready(function() {
         game.throwDices();
     });
     document.getElementById("restart").addEventListener("click", function() {
-        game.resetBoardState();
-        game.throwDices();
-        game.interactBoard();
+        location.reload(); // Reloads the page to reset the website
     });
     document.addEventListener('contextmenu', function(e) {
         var menu = document.getElementById('menu');
