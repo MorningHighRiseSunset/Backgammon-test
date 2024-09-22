@@ -1,10 +1,10 @@
 :root {
-    --black-color: #424242; /* Darker Gray for black checkers */
-    --white-color: #ffffff; /* Keeping menu item white */
-    --bg-color: #f5f5f5; /* Light Gray */
-    --primary-color: #9e9e9e; /* Gray */
-    --secondary-color: #616161; /* Dark Gray */
-    --accent-color: #f44336; /* Red */
+    --black-color: #432818; /* Dark Brown for black checkers */
+    --white-color: #FFE6A7; /* Light Beige for white checkers */
+    --bg-color: #FFE6A7; /* Light Beige for background */
+    --primary-color: #BB9457; /* Medium Brown for primary elements */
+    --secondary-color: #99582A; /* Darker Brown for secondary elements */
+    --accent-color: #6F1D1B; /* Dark Red for accents */
 }
 * {
     box-sizing: border-box;
@@ -24,13 +24,14 @@ html body {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column; /* Added to align items vertically */
 }
 html body #board {
     position: relative;
     width: 96vmin;
     height: 96vmin;
-    background-color: var(--primary-color); /* Gray for the board */
-    border: 1vmin var(--black-color) solid; /* Dark Gray border */
+    background-color: var(--primary-color); /* Medium Brown for the board */
+    border: 1vmin var(--accent-color) solid; /* Dark Brown border */
     display: flex;
     flex-flow: column wrap;
     justify-content: space-between;
@@ -39,26 +40,26 @@ html body #players {
     position: relative;
     width: 14vmin;
     height: 96vmin;
-    background-color: var(--primary-color); /* Gray for players */
-    border: 1vmin var(--black-color) solid; /* Dark Gray border */
+    background-color: var(--primary-color); /* Medium Brown for players */
+    border: 1vmin var(--black-color) solid; /* Dark Brown border */
     display: flex;
     flex-flow: column wrap;
 }
 html body #players .player .color-control {
     width: 100%;
     height: 10%;
-    background-color: var(--white-color);
+    background-color: var(--white-color); /* Light Beige for color control */
 }
 html body #players .player .drop-area {
     width: 100%;
     height: 90%;
-    background-color: var(--primary-color); /* Gray for drop area */
+    background-color: var(--primary-color); /* Medium Brown for drop area */
 }
 html body #players #black .color-control {
-    background-color: var(--black-color); /* Darker Gray for black checkers */
+    background-color: var(--black-color); /* Dark Brown for black checkers */
 }
 html body #players .current .color-control {
-    background-color: var(--accent-color) !important; /* Red for current player */
+    background-color: var(--accent-color) !important; /* Dark Red for current player */
 }
 html body #debug {
     position: absolute;
@@ -94,12 +95,12 @@ html body #debug {
     background: transparent;
 }
 #board .qdr .cl:nth-child(odd)::after {
-    border-color: #b0bec5; /* Light Gray for odd columns */
+    border-color: var(--white-color); /* Light Beige for odd columns */
     border-left-color: transparent;
     border-right-color: transparent;
 }
 #board .qdr .cl:nth-child(even)::after {
-    border-color: #90a4ae; /* Darker Gray for even columns */
+    border-color: var(--secondary-color); /* Darker Brown for even columns */
     border-left-color: transparent;
     border-right-color: transparent;
 }
@@ -108,9 +109,9 @@ html body #debug {
     content: "";
     min-width: 7vmin;
     min-height: 7vmin;
-    border: 0.5vmin var(--black-color) solid; /* Dark Gray border */
+    border: 0.5vmin var(--black-color) solid; /* Dark Brown border */
     border-radius: 3.5vmin;
-    background-color: var(--white-color);
+    background-color: var(--white-color); /* Light Beige for white checkers */
     z-index: 999;
     margin: 0.05vmin auto;
 }
@@ -122,9 +123,9 @@ html body #debug {
     content: "";
     min-width: 7vmin;
     min-height: 7vmin;
-    border: 0.5vmin var(--black-color) solid; /* Dark Gray border */
+    border: 0.4vmin var(--white-color) solid; /* Light Beige border */
     border-radius: 3.5vmin;
-    background-color: var(--black-color); /* Darker Gray for black checkers */
+    background-color: var(--black-color); /* Dark Brown for black checkers */
     z-index: 999;
     margin: 0.05vmin auto;
 }
@@ -184,16 +185,16 @@ html body #debug {
     justify-content: space-around;
     width: 8vmin;
     height: 96vmin;
-    background-color: var(--black-color); /* Dark Gray for the board bar */
+    background-color: var(--black-color); /* Dark Brown for the board bar */
 }
 #board-bar .white {
     display: flex;
     content: "";
     min-width: 7vmin;
     min-height: 7vmin;
-    border: 0.5vmin var(--black-color) solid; /* Dark Gray border */
+    border: 0.5vmin var(--black-color) solid; /* Dark Brown border */
     border-radius: 3.5vmin;
-    background-color: var(--white-color);
+    background-color: var(--white-color); /* Light Beige for white checkers */
     z-index: 999;
     margin: 0.05vmin auto;
 }
@@ -205,9 +206,9 @@ html body #debug {
     content: "";
     min-width: 7vmin;
     min-height: 7vmin;
-    border: 0.5vmin var(--black-color) solid; /* Dark Gray border */
+    border: 0.5vmin var(--black-color) solid; /* Dark Brown border */
     border-radius: 3.5vmin;
-    background-color: var(--black-color); /* Darker Gray for black checkers */
+    background-color: var(--black-color); /* Dark Brown for black checkers */
     z-index: 999;
     margin: 0.05vmin auto;
 }
@@ -264,7 +265,7 @@ html body #debug {
     left: 0;
     width: 6vmin;
     height: 6vmin;
-    background-color: var(--black-color); /* Dark Gray for dice side */
+    background-color: var(--black-color); /* Dark Brown for dice side */
     padding: 0.9vmin;
     display: flex;
     flex-flow: row wrap;
@@ -280,25 +281,25 @@ html body #debug {
     width: 1.2vmin;
     height: 1.2vmin;
     border-radius: 1vmin;
-    background-color: var(--black-color); /* Dark Gray for dots */
+    background-color: var(--black-color); /* Dark Brown for dots */
 }
 #board #dices .dice-side-1 .dot:nth-child(5) {
-    background-color: #f5f5f5; /* Light Gray for the dot */
+    background-color: var(--bg-color); /* Light Beige for the dot */
 }
 #board #dices .dice-side-2 .dot:nth-child(1), #board #dices .dice-side-2 .dot:nth-child(9) {
-    background-color: #f5f5f5; /* Light Gray for the dot */
+    background-color: var(--bg-color); /* Light Beige for the dot */
 }
 #board #dices .dice-side-3 .dot:nth-child(1), #board #dices .dice-side-3 .dot:nth-child(5), #board #dices .dice-side-3 .dot:nth-child(9) {
-    background-color: #f5f5f5; /* Light Gray for the dot */
+    background-color: var(--bg-color); /* Light Beige for the dot */
 }
 #board #dices .dice-side-4 .dot:nth-child(1), #board #dices .dice-side-4 .dot:nth-child(3), #board #dices .dice-side-4 .dot:nth-child(7), #board #dices .dice-side-4 .dot:nth-child(9) {
-    background-color: #f5f5f5; /* Light Gray for the dot */
+    background-color: var(--bg-color); /* Light Beige for the dot */
 }
 #board #dices .dice-side-5 .dot:nth-child(1), #board #dices .dice-side-5 .dot:nth-child(3), #board #dices .dice-side-5 .dot:nth-child(5), #board #dices .dice-side-5 .dot:nth-child(7), #board #dices .dice-side-5 .dot:nth-child(9) {
-    background-color: #f5f5f5; /* Light Gray for the dot */
+    background-color: var(--bg-color); /* Light Beige for the dot */
 }
 #board #dices .dice-side-6 .dot:nth-child(1), #board #dices .dice-side-6 .dot:nth-child(3), #board #dices .dice-side-6 .dot:nth-child(4), #board #dices .dice-side-6 .dot:nth-child(6), #board #dices .dice-side-6 .dot:nth-child(7), #board #dices .dice-side-6 .dot:nth-child(9) {
-    background-color: #f5f5f5; /* Light Gray for the dot */
+    background-color: var(--bg-color); /* Light Beige for the dot */
 }
 #board #dices .dice-side-1 {
     transform: rotateX(90deg);
@@ -333,7 +334,7 @@ html body #debug {
     float: left;
     height: 40px;
     line-height: 40px;
-    background-color: var(--white-color); /* Keeping menu item white */
+    background-color: var(--white-color); /* Light Beige for menu item */
     color: #333333; /* Darker text for better contrast */
 }
 #menu .menu-item:hover {
@@ -349,4 +350,16 @@ html body #debug {
         top: 30vmin;
         transform: scale(1);
     }
+}
+
+/* New CSS for the turn title */
+#turn-title {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--accent-color); /* Dark Red for the turn title */
+    position: absolute;
+    left: 15%;
+    top: 50%;
+    transform: translateY(-20%);
+    margin: 0;
 }
