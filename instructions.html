@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Backgammon Instructions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Backgammon Rules</h1>
+    <p>Backgammon is a game for two players, played on a board consisting of twenty-four narrow triangles called points. The triangles alternate in color and are grouped into four quadrants of six triangles each. The quadrants are referred to as a player's home board and outer board, and the opponent's home board and outer board. The home and outer boards are separated from each other by a ridge down the center of the board called the bar.</p>
+    <h2>Objective</h2>
+    <p>The objective of the game is to move all of your checkers into your own home board and then bear them off. The first player to bear off all of their checkers wins the game.</p>
+    <h2>Setup</h2>
+    <p>Each player has fifteen checkers of their own color. The initial arrangement of checkers is as follows:</p>
+    <ul>
+        <li>Two checkers on each player's 24-point</li>
+        <li>Five checkers on each player's 13-point</li>
+        <li>Three checkers on each player's 8-point</li>
+        <li>Five checkers on each player's 6-point</li>
+    </ul>
+    <h2>Movement</h2>
+    <p>Players take turns rolling two dice and moving their checkers according to the numbers shown on the dice. A checker may be moved to an open point, one that is not occupied by two or more opposing checkers. The numbers on the two dice constitute separate moves. For example, if a player rolls a 6 and a 3, they may move one checker six spaces to an open point and another checker three spaces to an open point, or they may move the same checker a total of nine spaces to an open point, but only if the intermediate point (either three or six spaces from the starting point) is also open.</p>
+    <p>White checkers move counterclockwise around the board, while black checkers move clockwise.</p>
+    <h2>Hitting and Entering</h2>
+    <p>If a checker lands on a point occupied by a single opposing checker, the opposing checker is hit and placed on the bar. A checker on the bar must re-enter the game through the opponent's home board before any other move can be made.</p>
+    <h2>Bearing Off</h2>
+    <p>Once a player has moved all fifteen of their checkers into their home board, they may begin bearing off. A player bears off a checker by rolling a number that corresponds to the point on which the checker resides and then removing that checker from the board. The first player to bear off all fifteen checkers wins the game.</p>
+    <h2>Game Mechanics</h2>
+    <p>The game includes several mechanics to ensure fair play and strategic depth:</p>
+    <ul>
+        <li><strong>Blots:</strong> A blot is a point occupied by a single checker. If an opposing checker lands on a blot, the blot is hit and the checker is placed on the bar.</li>
+        <li><strong>Hits:</strong> When a checker lands on a blot, the opposing checker is hit and placed on the bar. The player must re-enter the hit checker before making any other moves.</li>
+        <li><strong>Turns:</strong> Players take turns rolling the dice and moving their checkers. If a player cannot make a valid move, their turn is forfeited.</li>
+        <li><strong>Moves:</strong> Players can move their checkers according to the numbers rolled on the dice. The numbers on the two dice can be used for separate moves or combined for a single move.</li>
+    </ul>
+    <h2>Double-Click Bearing Off</h2>
+    <p>The game allows players to bear off their checkers by double-clicking on a checker when all of their checkers are in their home board. The code handles this as follows:</p>
+    <ul>
+        <li>When a player double-clicks on a checker, the game checks if all of the player's checkers are in their home board.</li>
+        <li>If all checkers are in the home board, the game calculates the move based on the dice roll and removes the checker from the board if the move is valid.</li>
+        <li>The game updates the board state and checks if the player has borne off all of their checkers to determine if they have won the game.</li>
+    </ul>
+    <h2>Code Implementation</h2>
+    <p>The following JavaScript functions are used to implement the game mechanics:</p>
+    <ul>
+        <li><strong>canMove:</strong> Checks if a player can make a valid move based on the current dice roll.</li>
+        <li><strong>isValidMove:</strong> Validates a move based on the game rules, including checking for hits and blots.</li>
+        <li><strong>move:</strong> Moves a checker from one point to another and updates the game state.</li>
+        <li><strong>getMovesWhenMoving:</strong> Calculates all the moves that will be performed when a checker is moved.</li>
+        <li><strong>pointClicked:</strong> Handles the logic for when a player clicks on a point, including selecting a checker and making a move.</li>
+        <li><strong>autoMove:</strong> Automatically selects the longest valid move for a checker when double-clicked.</li>
+    </ul>
+</body>
+</html>
