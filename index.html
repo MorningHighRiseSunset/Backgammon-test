@@ -42,8 +42,8 @@
         }
 
         window.activatePlayerVsPlayer = function() {
-            b.getBoard().playerTypeMap['b'] = 'human';
-            alert('Player vs Player mode activated!');
+            // Redirect to the player vs player mode
+            window.location.href = 'https://backgammon-two-player.netlify.app/';
         }
 
         window.reloadPage = function() {
@@ -53,9 +53,8 @@
 </head>
 <body>
     <button id="instructionsButton" onclick="openInstructions()">Instructions</button>
-    <button class="button" onclick="activatePlayerVsPlayer()">Player vs Player Mode</button>
-    <button class="button" onclick="activateComputerVsPlayer()">Computer vs Player Mode</button>
-    <button class="button" onclick="reloadPage()">Reload Page</button> <!-- New button added -->
+    <button class="button" onclick="activatePlayerVsPlayer()">Player vs Player or Computer vs PlayerMode</button> <!-- Updated to redirect -->
+    <button class="button" onclick="reloadPage()">Reload Page</button>
     <canvas id="backgammon" width="600px" height="500px"></canvas>
 </body>
 </html>
