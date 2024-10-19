@@ -1,106 +1,61 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-
     <script type="text/javascript" charset="utf-8" src="jquery.min.js"></script>
-
     <script type="text/javascript" charset="utf-8" src="backgammon.js"></script>
-
-
     <script type="text/javascript" charset="utf-8" src="backgammon_ai.js"></script>
-
     <style>
-
         body {
-
             display: flex;
-
-
             flex-direction: column;
-
-
             align-items: center;
-
-
             justify-content: center;
-
-
             height: 100vh;
-
-
             margin: 0;
         }
-
         #instructionsButton, .button {
-
-
             margin-bottom: 20px;
-
             padding: 10px 20px;
             font-size: 16px;
-
             text-decoration: none;
-
-
             color: black;
             background-color: #f0f0f0;
-
             border: 1px solid #ccc;
-
             border-radius: 4px;
-
-
             display: inline-block;
-
             text-align: center;
         }
-
     </style>
-
     <script type="text/javascript" charset="utf-8">
         window.onload = function () {
-
             var conf = {};
-
-
             conf.playerTypeMap = {};
-
-
             conf.playerTypeMap['b'] = "computer";
-
-
             conf.playerTypeMap['w'] = "human";
-
-
             window.b = new BackGammon("backgammon", conf);
-
-
             var ai = new BackGammonAI(b, b.BLACK);
-
             b.registerStateListener(ai.stateChanged);
-
-
         };
 
         window.openInstructions = function() {
-
             window.open('instructions.html', 'Instructions', 'width=600,height=400');
-
         }
 
+        window.activatePlayerVsPlayer = function() {
+            b.getBoard().playerTypeMap['b'] = 'human';
+            alert('Player vs Player mode activated!');
+        }
 
+        window.reloadPage = function() {
+            location.reload();
+        }
     </script>
 </head>
 <body>
-
-    <h1>Backgammon : Computer Vs. Player Mode</h1> <!-- Added title -->
-
-
     <button id="instructionsButton" onclick="openInstructions()">Instructions</button>
-
-
-    <a class="button" href="https://backgammon-two-player.netlify.app/" target="_blank">Two Player or Computer Mode</a>
-
+    <button class="button" onclick="activatePlayerVsPlayer()">Player vs Player Mode</button>
+    <button class="button" onclick="activateComputerVsPlayer()">Computer vs Player Mode</button>
+    <button class="button" onclick="reloadPage()">Reload Page</button> <!-- New button added -->
     <canvas id="backgammon" width="600px" height="500px"></canvas>
 </body>
 </html>
