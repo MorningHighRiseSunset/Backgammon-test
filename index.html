@@ -1,6 +1,14 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RWGY7JXP6M"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-RWGY7JXP6M');
+    </script>
     <script type="text/javascript" charset="utf-8" src="jquery.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="backgammon.js"></script>
     <script type="text/javascript" charset="utf-8" src="backgammon_ai.js"></script>
@@ -36,35 +44,21 @@
             var ai = new BackGammonAI(b, b.BLACK);
             b.registerStateListener(ai.stateChanged);
         };
-
         window.openInstructions = function() {
             window.open('instructions.html', 'Instructions', 'width=600,height=400');
         }
-
         window.activatePlayerVsPlayer = function() {
             // Redirect to the player vs player mode
             window.location.href = 'https://backgammon-two-player.netlify.app/';
         }
-
         window.reloadPage = function() {
             location.reload();
         }
     </script>
 </head>
-
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-RWGY7JXP6M"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-RWGY7JXP6M');
-</script>
-    
 <body>
     <button id="instructionsButton" onclick="openInstructions()">Instructions</button>
-    <button class="button" onclick="activatePlayerVsPlayer()">Player vs Player or Computer vs PlayerMode</button> <!-- Updated to redirect -->
+    <button class="button" onclick="activatePlayerVsPlayer()">Player vs Player or Computer vs PlayerMode</button>
     <button class="button" onclick="reloadPage()">Reload Page</button>
     <canvas id="backgammon" width="600px" height="500px"></canvas>
 </body>
