@@ -1,14 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RWGY7JXP6M"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-RWGY7JXP6M');
-    </script>
+    <title>Backgammon - Player vs Computer AI</title>
     <script type="text/javascript" charset="utf-8" src="jquery.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="backgammon.js"></script>
     <script type="text/javascript" charset="utf-8" src="backgammon_ai.js"></script>
@@ -18,20 +11,102 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            font-family: 'Arial', sans-serif;
+            color: white;
         }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
         #instructionsButton, .button {
-            margin-bottom: 20px;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 16px;
             text-decoration: none;
-            color: black;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            display: inline-block;
+            color: white;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            min-width: 200px;
             text-align: center;
+        }
+
+        #instructionsButton:hover, .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff8e53, #ff6b6b);
+        }
+
+        #instructionsButton:active, .button:active {
+            transform: translateY(1px);
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        canvas {
+            border-radius: 10px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            display: block; /* Removes any extra space below the canvas */
+            margin: 0 auto; /* Centers the canvas horizontally */
+        }
+
+        @media (max-width: 650px) {
+            .game-container {
+                padding: 1rem;
+                width: 90%;
+            }
+
+            canvas {
+                width: 100%;
+                height: auto;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            #instructionsButton, .button {
+                min-width: 150px;
+                font-size: 14px;
+            }
         }
     </style>
     <script type="text/javascript" charset="utf-8">
@@ -44,22 +119,31 @@
             var ai = new BackGammonAI(b, b.BLACK);
             b.registerStateListener(ai.stateChanged);
         };
+
         window.openInstructions = function() {
             window.open('instructions.html', 'Instructions', 'width=600,height=400');
         }
+
         window.activatePlayerVsPlayer = function() {
-            // Redirect to the player vs player mode
             window.location.href = 'https://backgammon-two-player.netlify.app/';
         }
+
         window.reloadPage = function() {
             location.reload();
         }
     </script>
 </head>
 <body>
-    <button id="instructionsButton" onclick="openInstructions()">Instructions</button>
-    <button class="button" onclick="activatePlayerVsPlayer()">Player vs Player or Computer vs PlayerMode</button>
-    <button class="button" onclick="reloadPage()">Reload Page</button>
-    <canvas id="backgammon" width="600px" height="500px"></canvas>
+    <div class="game-container">
+        <h1>🎲 Backgammon 🎲</h1>
+        <div class="button-container">
+            <button id="instructionsButton" onclick="openInstructions()">📖 Instructions</button>
+            <button class="button" onclick="activatePlayerVsPlayer()">👥 Player vs Player Mode</button>
+            <button class="button" onclick="reloadPage()">🔄 New Game</button>
+        </div>
+        <div class="canvas-container">
+            <canvas id="backgammon" width="600" height="500"></canvas>
+        </div>
+    </div>
 </body>
 </html>
