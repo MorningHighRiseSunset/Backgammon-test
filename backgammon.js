@@ -285,10 +285,21 @@ var move = function (from_point, to_point, player) {
   var moves = getMovesWhenMoving(from_point, to_point, player);
   for (var i=0; i < moves.length; i++) {
     _movePiece(moves[i][0], moves[i][1]);
+    
+    // Play sound if an opponent's piece is moved to the bar
+    if (moves[i][0] === to_point && moves[i][1] === outPos(swap(player))) {
+      playBarSound();
+    }
   }
   var steps = getSteps(from_point, to_point, player);
   useDice(steps);
   return true; 
+}
+
+// Function to play sound when a piece is placed on the bar
+var playBarSound = function() {
+  var audio = new Audio('level-up-bonus-sequence-1-186890.mp3'); // Ensure this file is in the correct path
+  audio.play();
 }
 
 var getMovesWhenMoving = function(from_point, to_point, player) {
@@ -791,6 +802,19 @@ var onMouseClick = function (ev) {
 }
 
 var throwDice = function() {
+  // Array of audio file paths
+  var audioFiles = [
+    'dice-142528.mp3',
+    'rpg-dice-rolling-95182.mp3',
+    'rolling-dice-2-102706.mp3',
+    'gamemisc_dice-roll-on-wood_jaku5-37414.mp3'
+  ];
+
+  // Randomly select an audio file
+  var randomIndex = Math.floor(Math.random() * audioFiles.length);
+  var audio = new Audio(audioFiles[randomIndex]);
+  audio.play();
+
   if (gameState === STATES.CHOOSE_STARTER) {
     var value = getRandomDiceThrow();
     board.addDice(value);
@@ -920,12 +944,17 @@ var drawRollButton = function() {
   if ( gameState == STATES.CHOOSE_STARTER || gameState == STATES.THROWING_DICE) {
     context.beginPath();
     context.rect(ROLL_BUTTON_X, ROLL_BUTTON_Y, ROLL_BUTTON_WIDTH, ROLL_BUTTON_HEIGHT);
-    context.fillStyle = 'white';
+    context.fillStyle = 'black';
     context.fill();
     
+    // Center both texts in the button
     context.beginPath();
-    context.fillStyle = 'black'
-    context.fillText('Roll', ROLL_BUTTON_X + 16, ROLL_BUTTON_Y + 17)
+    context.fillStyle = 'white';
+    // Center "Click" horizontally and position it 1/3 down from button top
+    context.textAlign = 'center';
+    context.fillText('ROLL', ROLL_BUTTON_X + (ROLL_BUTTON_WIDTH/2), ROLL_BUTTON_Y + (ROLL_BUTTON_HEIGHT/3));
+    // Center "Roll" horizontally and position it 2/3 down from button top
+    context.fillText('DICE', ROLL_BUTTON_X + (ROLL_BUTTON_WIDTH/2), ROLL_BUTTON_Y + (ROLL_BUTTON_HEIGHT * 2/3));
   }
 }
 
@@ -1081,7 +1110,7 @@ var initDimensions = function () {
   ROLL_BUTTON_X = conf.border * 4;
   ROLL_BUTTON_Y = halfBoardHeight/2;
   ROLL_BUTTON_HEIGHT = 30;
-  ROLL_BUTTON_WIDTH = 50;
+  ROLL_BUTTON_WIDTH = 45;
 };
 
 var initMisc = function () {
@@ -1102,7 +1131,7 @@ var loadConfig = function () {
       conf.playerTypeMap[board.BLACK] = HUMAN;
       conf.playerTypeMap[board.WHITE] = HUMAN;
   }
-  conf.boardBorderColor = "#5C3317";
+  conf.boardBorderColor = "#8a4b20";
   conf.lightColor = "#EDE0D4"; // Light color for triangles
   conf.darkColor = "#7F5539"; // Dark color for triangles
   conf.colorMap = {'w':"#DDB892",'b':"#9C6644"}; // Light Beige for white checkers, Dark Brown for black checkers
