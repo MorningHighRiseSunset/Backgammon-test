@@ -84,8 +84,36 @@
         canvas {
             border-radius: 10px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            display: block; /* Removes any extra space below the canvas */
-            margin: 0 auto; /* Centers the canvas horizontally */
+            display: block;
+            margin: 0 auto;
+        }
+
+        .hint-popup {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: bottom 0.5s ease;
+            text-align: center;
+            font-size: 16px;
+            max-width: 80%;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50%) translateY(0px); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+            100% { transform: translateX(-50%) translateY(0px); }
+        }
+
+        .hint-popup.show {
+            bottom: 20px;
         }
 
         @media (max-width: 650px) {
@@ -135,15 +163,67 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>🎲 Backgammon 🎲</h1>
+        <h1>🎲 Backgammon - Player vs Computer AI 🎲</h1>
         <div class="button-container">
             <button id="instructionsButton" onclick="openInstructions()">📖 Instructions</button>
-            <button class="button" onclick="activatePlayerVsPlayer()">👥 Player vs Player Mode</button>
+            <button class="button" onclick="activatePlayerVsPlayer()">👥 Click to Join Player vs Player Mode</button>
             <button class="button" onclick="reloadPage()">🔄 New Game</button>
         </div>
         <div class="canvas-container">
             <canvas id="backgammon" width="600" height="500"></canvas>
         </div>
     </div>
+
+    <div id="hint-popup" class="hint-popup"></div>
+
+    <script>
+        // Backgammon tips and hints array
+        const tips = [
+            "💡 Try to make points in sequence to build a prime",
+            "⚠️ Don't leave single checkers exposed - they can be hit!",
+            "🎯 The 5 and 6 points are key defensive positions",
+            "✉️ Found a bug or have suggestions? Email maurice13stu@gmail.com",
+            "🎲 Early in the game, try to occupy your opponent's 5-point",
+            "⚡ Don't rush to bear off if you have vulnerable checkers",
+            "🌟 The best opening roll in backgammon is 3-1",
+            "🛡️ Try to maintain at least two checkers on each point",
+            "🔥 Running game or blocking game? Choose based on your position",
+            "📧 Contact maurice13stu@gmail.com with any feedback!",
+            "🎮 Control the center points (8, 13, and 12) when possible",
+            "💪 Building a prime of 6 consecutive points is a strong strategy",
+            "🎯 The bar point (7) is a crucial defensive position",
+            "🔄 Always look for opportunities to hit opponent's blots",
+            "🎲 When bearing off, try to maintain an even distribution"
+        ];
+
+        let previousTipIndex = -1;
+
+        function getRandomTip() {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * tips.length);
+            } while (newIndex === previousTipIndex);
+            
+            previousTipIndex = newIndex;
+            return tips[newIndex];
+        }
+
+        function showHint() {
+            const hintPopup = document.getElementById('hint-popup');
+            const randomTip = getRandomTip();
+            hintPopup.textContent = randomTip;
+            hintPopup.classList.add('show');
+            
+            setTimeout(() => {
+                hintPopup.classList.remove('show');
+            }, 5000); // Show for 5 seconds
+        }
+
+        // Show first hint after 5 seconds
+        setTimeout(showHint, 5000);
+        
+        // Show new hint every 15 seconds
+        setInterval(showHint, 15000);
+    </script>
 </body>
 </html>
