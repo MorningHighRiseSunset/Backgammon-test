@@ -780,16 +780,9 @@ var isPushingRoll = function(x, y) {
 }
 
 var onMouseClick = function (ev) {
-  
-  // Ignore click if current player isnt human
-  if (getPlayerType(currentPlayer) != HUMAN) {
-    console.log('ignoring click', currentPlayer, getPlayerType(currentPlayer), playerTypeMap);
-    return;
-  }
-  
-  // Get mouse x and y pos
-  var x = ev.clientX - canvas.offsetLeft,
-      y = ev.clientY - canvas.offsetTop;
+  var rect = canvas.getBoundingClientRect();
+  var x = ev.clientX - rect.left,
+      y = ev.clientY - rect.top;
   
   if (gameState == STATES.MOVING) {
     var point = coordinatesToPoint(x, y);
@@ -800,6 +793,7 @@ var onMouseClick = function (ev) {
     throwDice();
   }
 }
+
 
 var throwDice = function() {
   // Array of audio file paths
