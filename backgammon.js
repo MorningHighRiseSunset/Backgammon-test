@@ -646,8 +646,9 @@ var autoMove = function () {
 }
 
 var canSelectPoint = function (point) {
-  return board.getPlayerAtPoint(point) == currentPlayer &&
-       (!board.hasPieceOut(currentPlayer) || point == board.outPos(currentPlayer));
+  // Ensure only the current player's pieces can be selected
+  return board.getPlayerAtPoint(point) === currentPlayer &&
+         (!board.hasPieceOut(currentPlayer) || point === board.outPos(currentPlayer));
 }
 
 var isGameOver = function () {
@@ -882,28 +883,30 @@ var move = function(fromPoint, toPoint, player) {
   createAnimations(boardBeforeMove, allMoves, player);
 }
 
-
-
 var pointClicked = function (point) {
+  // Check if the selected point belongs to the current player
+  if (board.getPlayerAtPoint(point) !== currentPlayer) {
+    return; // Do nothing if the point does not belong to the current player
+  }
+
   // Point is already selected, move
-  if (selectedPoint != undefined) {
-    
+  if (selectedPoint !== undefined) {
     // Double click, select longest dice move as to
-    if ( selectedPoint == point ) {
+    if (selectedPoint === point) {
       point = autoMove();
     }
-    
+
     // valid move, move
     if (board.isValidMove(selectedPoint, point, currentPlayer)) {
       move(selectedPoint, point, currentPlayer);
     }
     selectPoint(undefined);
   // Select point
-  } else if (canSelectPoint(point)){
-      selectPoint(point);
-      redraw();
+  } else if (canSelectPoint(point)) {
+    selectPoint(point);
+    redraw();
   }
-  
+
   if (isGameOver()) {
     alert('Congratulations ' + VANITY_MAP[winner()] + ' won the game!');
   }
