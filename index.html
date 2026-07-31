@@ -1,0 +1,239 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Backgammon - Player vs Computer AI</title>
+    <!-- Vercel Analytics -->
+    <script src="https://cdn.vercel-analytics.com/analytics.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HF304QWC0Q"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HF304QWC0Q');
+    </script>
+    <script type="text/javascript" charset="utf-8" src="jquery.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="backgammon.js"></script>
+    <script type="text/javascript" charset="utf-8" src="backgammon_ai.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        #instructionsButton, .button {
+            padding: 12px 24px;
+            font-size: 16px;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        #instructionsButton:hover, .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff8e53, #ff6b6b);
+        }
+
+        #instructionsButton:active, .button:active {
+            transform: translateY(1px);
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        canvas {
+            border-radius: 10px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .hint-popup {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: bottom 0.5s ease;
+            text-align: center;
+            font-size: 16px;
+            max-width: 80%;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50%) translateY(0px); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+            100% { transform: translateX(-50%) translateY(0px); }
+        }
+
+        .hint-popup.show {
+            bottom: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .game-container {
+                padding: 1rem;
+                width: 90%;
+            }
+
+            canvas {
+                width: 100%;
+                height: auto;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            #instructionsButton, .button {
+                min-width: 150px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <script type="text/javascript" charset="utf-8">
+        window.onload = function () {
+            var conf = {};
+            conf.playerTypeMap = {};
+            conf.playerTypeMap['b'] = "computer";
+            conf.playerTypeMap['w'] = "human";
+            window.b = new BackGammon("backgammon", conf);
+            var ai = new BackGammonAI(b, b.BLACK);
+            b.registerStateListener(ai.stateChanged);
+        };
+
+        window.openInstructions = function() {
+            window.open('instructions.html', 'Instructions', 'width=600,height=400');
+        }
+
+        window.activatePlayerVsPlayer = function() {
+            window.location.href = 'https://backgammon-two-player.netlify.app/';
+        }
+
+        window.reloadPage = function() {
+            location.reload();
+        }
+    </script>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎲 Backgammon - Player vs Computer AI 🎲</h1>
+        <div class="button-container">
+            <button id="instructionsButton" onclick="openInstructions()">📖 Instructions</button>
+            <button class="button" onclick="activatePlayerVsPlayer()">👥 Click to Join Player vs Player Mode</button>
+            <button class="button" onclick="reloadPage()">🔄 New Game</button>
+        </div>
+        <div class="canvas-container">
+            <canvas id="backgammon" width="600" height="500"></canvas>
+        </div>
+    </div>
+
+    <div id="hint-popup" class="hint-popup"></div>
+
+    <script>
+        // Backgammon tips and hints array
+        const tips = [
+            "💡 Try to make points in sequence to build a prime",
+            "⚠️ Don't leave single checkers exposed - they can be hit!",
+            "🎯 The 5 and 6 points are key defensive positions",
+            "✉️ Found a bug or have suggestions? Email maurice13stu@gmail.com",
+            "🎲 Early in the game, try to occupy your opponent's 5-point",
+            "⚡ Don't rush to bear off if you have vulnerable checkers",
+            "🌟 The best opening roll in backgammon is 3-1",
+            "🛡️ Try to maintain at least two checkers on each point",
+            "🔥 Running game or blocking game? Choose based on your position",
+            "📧 Contact maurice13stu@gmail.com with any feedback!",
+            "🎮 Control the center points (8, 13, and 12) when possible",
+            "💪 Building a prime of 6 consecutive points is a strong strategy",
+            "🎯 The bar point (7) is a crucial defensive position",
+            "🔄 Always look for opportunities to hit opponent's blots",
+            "🎲 When bearing off, try to maintain an even distribution"
+        ];
+
+        let previousTipIndex = -1;
+
+        function getRandomTip() {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * tips.length);
+            } while (newIndex === previousTipIndex);
+            
+            previousTipIndex = newIndex;
+            return tips[newIndex];
+        }
+
+        function showHint() {
+            const hintPopup = document.getElementById('hint-popup');
+            const randomTip = getRandomTip();
+            hintPopup.textContent = randomTip;
+            hintPopup.classList.add('show');
+            
+            setTimeout(() => {
+                hintPopup.classList.remove('show');
+            }, 5000); // Show for 5 seconds
+        }
+
+        // Show first hint after 5 seconds
+        setTimeout(showHint, 5000);
+        
+        // Show new hint every 15 seconds
+        setInterval(showHint, 15000);
+    </script>
+</body>
+</html>
