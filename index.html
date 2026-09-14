@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Backgammon - Player vs Computer AI</title>
+    <title>Backgammon Player vs AI</title>
     <!-- Vercel Analytics -->
     <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
     <!-- Google tag (gtag.js) -->
@@ -15,6 +15,9 @@
     <script type="text/javascript" charset="utf-8" src="jquery.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="backgammon.js"></script>
     <script type="text/javascript" charset="utf-8" src="backgammon_ai.js"></script>
+    <!-- Three.js for 3D dice -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <style>
         body {
             display: flex;
@@ -23,30 +26,32 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(135deg, #8B4513, #D2691E, #F5DEB3);
             font-family: 'Arial', sans-serif;
-            color: white;
+            color: #5D4037;
         }
 
         .game-container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            background: rgba(139, 69, 19, 0.2);
+            padding: 2.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 12px 40px 0 rgba(93, 64, 55, 0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: fit-content;
             margin: auto;
+            border: 2px solid rgba(210, 105, 30, 0.3);
         }
 
         h1 {
             margin-bottom: 30px;
             font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 2px 2px 4px rgba(93, 64, 55, 0.3);
             text-align: center;
+            color: #5D4037;
         }
 
         .button-container {
@@ -62,13 +67,13 @@
             padding: 12px 24px;
             font-size: 16px;
             text-decoration: none;
-            color: white;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: #5D4037;
+            background: linear-gradient(45deg, #D2691E, #F5DEB3);
             border: none;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(93, 64, 55, 0.2);
             font-weight: bold;
             min-width: 200px;
             text-align: center;
@@ -76,8 +81,8 @@
 
         #instructionsButton:hover, .button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(45deg, #ff8e53, #ff6b6b);
+            box-shadow: 0 6px 20px rgba(93, 64, 55, 0.3);
+            background: linear-gradient(45deg, #F5DEB3, #D2691E);
         }
 
         #instructionsButton:active, .button:active {
@@ -92,10 +97,11 @@
         }
 
         canvas {
-            border-radius: 10px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px 0 rgba(93, 64, 55, 0.4);
             display: block;
             margin: 0 auto;
+            border: 3px solid rgba(210, 105, 30, 0.4);
         }
 
         .hint-popup {
@@ -103,11 +109,11 @@
             bottom: -100px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(45deg, #2c3e50, #3498db);
-            color: white;
+            background: linear-gradient(45deg, #8B4513, #D2691E);
+            color: #F5DEB3;
             padding: 15px 25px;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(93, 64, 55, 0.3);
             z-index: 1000;
             transition: bottom 0.5s ease;
             text-align: center;
@@ -146,6 +152,343 @@
                 font-size: 14px;
             }
         }
+
+        /* 3D Dice Container */
+        #dice3d-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin: 20px 0;
+            width: 100%;
+            height: 120px;
+            background: none;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .dice-canvas {
+            width: 100px;
+            height: 100px;
+        }
+
+        .dice-canvas:hover {
+            cursor: pointer;
+        }
+
+        .dice-canvas.selected {
+            outline: 3px solid #ff6b6b;
+            outline-offset: 2px;
+        }
+
+        .dice-container .dice:hover {
+            cursor: pointer;
+        }
+
+        .dice-container .dice.selected {
+            outline: 3px solid #ff6b6b;
+            outline-offset: 2px;
+        }
+
+        /* Fallback CSS Dice */
+        .dice-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin: 20px 0;
+            perspective: 1200px;
+            background: none;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .dice {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .dice-face {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border: 3px solid #2c2c2c;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            box-shadow:
+                inset 0 0 20px rgba(0,0,0,0.1),
+                inset 0 2px 4px rgba(255,255,255,0.8),
+                0 4px 8px rgba(0,0,0,0.3);
+            backface-visibility: hidden;
+        }
+
+        .dice-face::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+
+        .dice-face:nth-child(1) { transform: rotateY(0deg) translateZ(40px); }
+        .dice-face:nth-child(2) { transform: rotateY(90deg) translateZ(40px); }
+        .dice-face:nth-child(3) { transform: rotateY(180deg) translateZ(40px); }
+        .dice-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); }
+        .dice-face:nth-child(5) { transform: rotateX(90deg) translateZ(40px); }
+        .dice-face:nth-child(6) { transform: rotateX(-90deg) translateZ(40px); }
+
+        .dice-face[data-value="1"]::before {
+            content: '';
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+        }
+
+        .dice-face[data-value="2"]::before {
+            content: '';
+            top: 25%;
+            left: 25%;
+        }
+        .dice-face[data-value="2"]::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            bottom: 25%;
+            right: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+
+        .dice-face[data-value="3"]::before {
+            content: '';
+            top: 25%;
+            left: 25%;
+        }
+        .dice-face[data-value="3"]::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            bottom: 25%;
+            right: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="3"] .center-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+
+        .dice-face[data-value="4"]::before {
+            content: '';
+            top: 25%;
+            left: 25%;
+        }
+        .dice-face[data-value="4"]::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            bottom: 25%;
+            right: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="4"] .extra-dot-1 {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            top: 25%;
+            right: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="4"] .extra-dot-2 {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            bottom: 25%;
+            left: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+
+        .dice-face[data-value="5"]::before {
+            content: '';
+            top: 25%;
+            left: 25%;
+        }
+        .dice-face[data-value="5"]::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            bottom: 25%;
+            right: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="5"] .extra-dot-1 {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            top: 25%;
+            right: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="5"] .extra-dot-2 {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            bottom: 25%;
+            left: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="5"] .center-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+
+        .dice-face[data-value="6"]::before {
+            content: '';
+            top: 25%;
+            left: 25%;
+        }
+        .dice-face[data-value="6"]::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            bottom: 25%;
+            right: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="6"] .extra-dot-1 {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            top: 25%;
+            right: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="6"] .extra-dot-2 {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            bottom: 25%;
+            left: 25%;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="6"] .middle-dot-1 {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            top: 50%;
+            left: 25%;
+            transform: translateY(-50%);
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+        .dice-face[data-value="6"] .middle-dot-2 {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #1a1a1a);
+            border-radius: 50%;
+            top: 50%;
+            right: 25%;
+            transform: translateY(-50%);
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.3);
+        }
+
+        .dice.rolling {
+            animation: roll 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes roll {
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            25% { transform: rotateX(180deg) rotateY(90deg) rotateZ(45deg); }
+            50% { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+            75% { transform: rotateX(540deg) rotateY(270deg) rotateZ(135deg); }
+            100% { transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg); }
+        }
     </style>
     <script type="text/javascript" charset="utf-8">
         window.onload = function () {
@@ -173,14 +516,57 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>🎲 Backgammon - Player vs Computer AI 🎲</h1>
+        <h1>🎲 Backgammon Player vs AI 🎲</h1>
         <div class="button-container">
             <button id="instructionsButton" onclick="openInstructions()">📖 Instructions</button>
-            <button class="button" onclick="activatePlayerVsPlayer()">👥 Click to Join Player vs Player Mode</button>
+            <button class="button" onclick="activatePlayerVsPlayer()">👥 Play Opponent</button>
             <button class="button" onclick="reloadPage()">🔄 New Game</button>
         </div>
         <div class="canvas-container">
             <canvas id="backgammon" width="600" height="500"></canvas>
+        </div>
+        <div id="dice-values-display" style="display: none; margin: 20px 0; font-size: 24px; font-weight: bold; color: #5D4037; text-align: center;">
+            <!-- Dice values will be displayed here -->
+        </div>
+        <div id="dice3d-container" style="display: none;">
+            <div id="dice1-canvas" class="dice-canvas"></div>
+            <div id="dice2-canvas" class="dice-canvas"></div>
+            <div id="dice3-canvas" class="dice-canvas" style="display: none;"></div>
+            <div id="dice4-canvas" class="dice-canvas" style="display: none;"></div>
+        </div>
+        <div class="dice-container" id="cssDiceContainer" style="display: none;">
+            <div class="dice" id="dice1">
+                <div class="dice-face" data-value="1"></div>
+                <div class="dice-face" data-value="2"></div>
+                <div class="dice-face" data-value="3"><div class="center-dot"></div></div>
+                <div class="dice-face" data-value="4"><div class="extra-dot-1"></div><div class="extra-dot-2"></div></div>
+                <div class="dice-face" data-value="5"><div class="extra-dot-1"></div><div class="extra-dot-2"></div><div class="center-dot"></div></div>
+                <div class="dice-face" data-value="6"><div class="extra-dot-1"></div><div class="extra-dot-2"></div><div class="middle-dot-1"></div><div class="middle-dot-2"></div></div>
+            </div>
+            <div class="dice" id="dice2">
+                <div class="dice-face" data-value="1"></div>
+                <div class="dice-face" data-value="2"></div>
+                <div class="dice-face" data-value="3"><div class="center-dot"></div></div>
+                <div class="dice-face" data-value="4"><div class="extra-dot-1"></div><div class="extra-dot-2"></div></div>
+                <div class="dice-face" data-value="5"><div class="extra-dot-1"></div><div class="extra-dot-2"></div><div class="center-dot"></div></div>
+                <div class="dice-face" data-value="6"><div class="extra-dot-1"></div><div class="extra-dot-2"></div><div class="middle-dot-1"></div><div class="middle-dot-2"></div></div>
+            </div>
+            <div class="dice" id="dice3" style="display: none;">
+                <div class="dice-face" data-value="1"></div>
+                <div class="dice-face" data-value="2"></div>
+                <div class="dice-face" data-value="3"><div class="center-dot"></div></div>
+                <div class="dice-face" data-value="4"><div class="extra-dot-1"></div><div class="extra-dot-2"></div></div>
+                <div class="dice-face" data-value="5"><div class="extra-dot-1"></div><div class="extra-dot-2"></div><div class="center-dot"></div></div>
+                <div class="dice-face" data-value="6"><div class="extra-dot-1"></div><div class="extra-dot-2"></div><div class="middle-dot-1"></div><div class="middle-dot-2"></div></div>
+            </div>
+            <div class="dice" id="dice4" style="display: none;">
+                <div class="dice-face" data-value="1"></div>
+                <div class="dice-face" data-value="2"></div>
+                <div class="dice-face" data-value="3"><div class="center-dot"></div></div>
+                <div class="dice-face" data-value="4"><div class="extra-dot-1"></div><div class="extra-dot-2"></div></div>
+                <div class="dice-face" data-value="5"><div class="extra-dot-1"></div><div class="extra-dot-2"></div><div class="center-dot"></div></div>
+                <div class="dice-face" data-value="6"><div class="extra-dot-1"></div><div class="extra-dot-2"></div><div class="middle-dot-1"></div><div class="middle-dot-2"></div></div>
+            </div>
         </div>
     </div>
 
@@ -218,12 +604,12 @@
             return tips[newIndex];
         }
 
-        function showHint() {
+        function showHint(customMessage) {
             const hintPopup = document.getElementById('hint-popup');
-            const randomTip = getRandomTip();
-            hintPopup.textContent = randomTip;
+            const message = customMessage || getRandomTip();
+            hintPopup.textContent = message;
             hintPopup.classList.add('show');
-            
+
             setTimeout(() => {
                 hintPopup.classList.remove('show');
             }, 5000); // Show for 5 seconds
@@ -234,6 +620,370 @@
         
         // Show new hint every 15 seconds
         setInterval(showHint, 15000);
+
+        // 3D Dice with Three.js
+        let dice1Scene, dice2Scene, dice1Camera, dice2Camera, dice1Renderer, dice2Renderer;
+        let dice1Model, dice2Model;
+        let dice1Loaded = false, dice2Loaded = false;
+
+        function init3DDice() {
+            // Initialize dice 1
+            const dice1Container = document.getElementById('dice1-canvas');
+            dice1Scene = new THREE.Scene();
+            dice1Camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            dice1Renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            dice1Renderer.setSize(100, 100);
+            dice1Container.appendChild(dice1Renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            dice1Scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            dice1Scene.add(directionalLight);
+
+            // Load dice model
+            const loader = new THREE.GLTFLoader();
+            loader.load('Dice/dice.glb', function(gltf) {
+                dice1Model = gltf.scene;
+                dice1Model.scale.set(2, 2, 2);
+                dice1Scene.add(dice1Model);
+                dice1Camera.position.z = 3;
+                dice1Loaded = true;
+                animateDice1();
+            }, undefined, function(error) {
+                console.error('Error loading dice model:', error);
+                // Fallback to CSS dice if GLB fails
+                console.log('Falling back to CSS dice');
+            });
+
+            // Initialize dice 2
+            const dice2Container = document.getElementById('dice2-canvas');
+            dice2Scene = new THREE.Scene();
+            dice2Camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            dice2Renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            dice2Renderer.setSize(100, 100);
+            dice2Container.appendChild(dice2Renderer.domElement);
+
+            // Lighting
+            const ambientLight2 = new THREE.AmbientLight(0xffffff, 0.6);
+            dice2Scene.add(ambientLight2);
+            const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight2.position.set(5, 5, 5);
+            dice2Scene.add(directionalLight2);
+
+            // Load dice model
+            loader.load('Dice/dice.glb', function(gltf) {
+                dice2Model = gltf.scene;
+                dice2Model.scale.set(2, 2, 2);
+                dice2Scene.add(dice2Model);
+                dice2Camera.position.z = 3;
+                dice2Loaded = true;
+                animateDice2();
+            }, undefined, function(error) {
+                console.error('Error loading dice model:', error);
+            });
+        }
+
+        function animateDice1() {
+            requestAnimationFrame(animateDice1);
+            if (dice1Model && dice1Renderer) {
+                dice1Renderer.render(dice1Scene, dice1Camera);
+            }
+        }
+
+        function animateDice2() {
+            requestAnimationFrame(animateDice2);
+            if (dice2Model && dice2Renderer) {
+                dice2Renderer.render(dice2Scene, dice2Camera);
+            }
+        }
+
+        function getDiceRotation(value) {
+            // Map dice values to rotations - based on calibration data
+            const rotations = {
+                1: { x: Math.PI / 2, y: 0, z: 0 },  // Position 2 shows 1
+                2: { x: 0, y: -Math.PI / 2, z: 0 }, // Position 5 shows 2
+                3: { x: Math.PI, y: 0, z: 0 },      // Position 8 shows 3
+                4: { x: 0, y: 0, z: 0 },           // Position 1 shows 4
+                5: { x: 0, y: Math.PI / 2, z: 0 },  // Position 4 shows 5
+                6: { x: -Math.PI / 2, y: 0, z: 0 }  // Position 3 shows 6
+            };
+            return rotations[value] || { x: 0, y: 0, z: 0 };
+        }
+
+        function animateDiceRoll(diceModel, targetRotation, duration = 1000) {
+            const startRotation = { x: diceModel.rotation.x, y: diceModel.rotation.y, z: diceModel.rotation.z };
+            const startTime = Date.now();
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Easing function
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                // Add some spinning during animation
+                const spinX = Math.sin(progress * Math.PI * 4) * Math.PI * 2;
+                const spinY = Math.cos(progress * Math.PI * 4) * Math.PI * 2;
+
+                diceModel.rotation.x = startRotation.x + (targetRotation.x - startRotation.x) * easeOut + spinX * (1 - easeOut);
+                diceModel.rotation.y = startRotation.y + (targetRotation.y - startRotation.y) * easeOut + spinY * (1 - easeOut);
+                diceModel.rotation.z = startRotation.z + (targetRotation.z - startRotation.z) * easeOut;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Ensure final rotation is exact
+                    diceModel.rotation.x = targetRotation.x;
+                    diceModel.rotation.y = targetRotation.y;
+                    diceModel.rotation.z = targetRotation.z;
+                }
+            }
+
+            animate();
+        }
+
+        // Dice selection state
+        let selectedDice = [];
+
+        function update3DDice(diceValues) {
+            const dice3dContainer = document.getElementById('dice3d-container');
+            const cssDiceContainer = document.getElementById('cssDiceContainer');
+            const diceValuesDisplay = document.getElementById('dice-values-display');
+
+            // Reset selected dice when new dice are rolled
+            selectedDice = [];
+
+            if (diceValues && diceValues.length > 0) {
+                // Show dice values in UI - show for both players
+                const currentPlayer = window.b && window.b.getCurrentPlayer ? window.b.getCurrentPlayer() : 'Unknown';
+                const playerName = currentPlayer === window.b.WHITE ? 'Player 1' : 'AI';
+                diceValuesDisplay.style.display = 'block';
+                diceValuesDisplay.textContent = playerName + ' rolled: ' + diceValues.join(', ');
+
+                // Try to use 3D dice first
+                if (dice1Loaded && dice2Loaded) {
+                    dice3dContainer.style.display = 'flex';
+                    cssDiceContainer.style.display = 'none';
+
+                    // Show/hide extra dice for doubles
+                    document.getElementById('dice3-canvas').style.display = diceValues.length > 2 ? 'block' : 'none';
+                    document.getElementById('dice4-canvas').style.display = diceValues.length > 3 ? 'block' : 'none';
+
+                    const delay = window.isAIRolling ? 0 : 1000;
+
+                    setTimeout(() => {
+                        // Update existing dice
+                        if (diceValues[0]) {
+                            const rotation1 = getDiceRotation(diceValues[0]);
+                            if (!window.isAIRolling) {
+                                animateDiceRoll(dice1Model, rotation1, 1000);
+                            } else {
+                                dice1Model.rotation.x = rotation1.x;
+                                dice1Model.rotation.y = rotation1.y;
+                                dice1Model.rotation.z = rotation1.z;
+                            }
+                        }
+
+                        if (diceValues[1]) {
+                            const rotation2 = getDiceRotation(diceValues[1]);
+                            if (!window.isAIRolling) {
+                                animateDiceRoll(dice2Model, rotation2, 1000);
+                            } else {
+                                dice2Model.rotation.x = rotation2.x;
+                                dice2Model.rotation.y = rotation2.y;
+                                dice2Model.rotation.z = rotation2.z;
+                            }
+                        }
+                    }, delay);
+                } else {
+                    // Fallback to CSS dice
+                    dice3dContainer.style.display = 'none';
+                    cssDiceContainer.style.display = 'flex';
+
+                    // Show/hide extra dice for doubles
+                    document.getElementById('dice3').style.display = diceValues.length > 2 ? 'block' : 'none';
+                    document.getElementById('dice4').style.display = diceValues.length > 3 ? 'block' : 'none';
+
+                    const dice1 = document.getElementById('dice1');
+                    const dice2 = document.getElementById('dice2');
+                    const dice3 = document.getElementById('dice3');
+                    const dice4 = document.getElementById('dice4');
+
+                    dice1.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                    dice2.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                    if (dice3) dice3.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                    if (dice4) dice4.style.transform = 'rotateX(0deg) rotateY(0deg)';
+
+                    if (!window.isAIRolling) {
+                        dice1.classList.add('rolling');
+                        dice2.classList.add('rolling');
+                        if (dice3) dice3.classList.add('rolling');
+                        if (dice4) dice4.classList.add('rolling');
+                    }
+
+                    const delay = window.isAIRolling ? 0 : 1000;
+                    setTimeout(() => {
+                        dice1.classList.remove('rolling');
+                        dice2.classList.remove('rolling');
+                        if (dice3) dice3.classList.remove('rolling');
+                        if (dice4) dice4.classList.remove('rolling');
+
+                        const rotations = {
+                            1: 'rotateX(90deg) rotateY(0deg)',
+                            2: 'rotateX(0deg) rotateY(-90deg)',
+                            3: 'rotateX(180deg) rotateY(0deg)',
+                            4: 'rotateX(0deg) rotateY(0deg)',
+                            5: 'rotateX(0deg) rotateY(90deg)',
+                            6: 'rotateX(-90deg) rotateY(0deg)'
+                        };
+
+                        if (diceValues[0]) {
+                            dice1.style.transform = rotations[diceValues[0]];
+                        }
+                        if (diceValues[1]) {
+                            dice2.style.transform = rotations[diceValues[1]];
+                        }
+                        if (diceValues[2] && dice3) {
+                            dice3.style.transform = rotations[diceValues[2]];
+                        }
+                        if (diceValues[3] && dice4) {
+                            dice4.style.transform = rotations[diceValues[3]];
+                        }
+                    }, delay);
+                }
+            } else {
+                dice3dContainer.style.display = 'none';
+                cssDiceContainer.style.display = 'none';
+                diceValuesDisplay.style.display = 'none';
+            }
+        }
+
+        function handleDiceClick(diceIndex) {
+            const remainingDices = window.b.getBoard().getRemainingDices();
+
+            if (remainingDices.length === 0) return;
+
+            // Toggle selection
+            const index = selectedDice.indexOf(diceIndex);
+            if (index > -1) {
+                selectedDice.splice(index, 1);
+            } else {
+                selectedDice.push(diceIndex);
+            }
+
+            // Update visual selection
+            updateDiceSelection();
+
+            // If both dice are selected, end turn
+            if (selectedDice.length === 2) {
+                showHint('Ending turn...');
+                setTimeout(() => {
+                    if (window.b && window.b.swap) {
+                        window.b.switchPlayer();
+                    }
+                    selectedDice = [];
+                    updateDiceSelection();
+                }, 500);
+            }
+        }
+
+        function updateDiceSelection() {
+            const dice1Canvas = document.getElementById('dice1-canvas');
+            const dice2Canvas = document.getElementById('dice2-canvas');
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+
+            // Update 3D dice selection
+            if (dice1Canvas) {
+                dice1Canvas.classList.toggle('selected', selectedDice.includes(0));
+            }
+            if (dice2Canvas) {
+                dice2Canvas.classList.toggle('selected', selectedDice.includes(1));
+            }
+
+            // Update CSS dice selection
+            if (dice1) {
+                dice1.classList.toggle('selected', selectedDice.includes(0));
+            }
+            if (dice2) {
+                dice2.classList.toggle('selected', selectedDice.includes(1));
+            }
+        }
+
+        // Hook into the game to update dice display
+        const originalThrowDice = window.b?.throwDice;
+        if (originalThrowDice) {
+            window.b.throwDice = function() {
+                originalThrowDice.call(this);
+                setTimeout(() => {
+                    const remainingDices = this.getBoard().getRemainingDices();
+                    update3DDice(remainingDices);
+                }, 100);
+            };
+        }
+
+        // Hook into state changes to hide dice when AI's turn
+        if (window.b && window.b.registerStateListener) {
+            window.b.registerStateListener(function() {
+                if (window.b && window.b.getCurrentPlayer && window.b.getCurrentPlayer() === window.b.BLACK) {
+                    update3DDice([]); // Hide dice during AI turn
+                } else if (window.b && window.b.getCurrentPlayer && window.b.getCurrentPlayer() === window.b.WHITE) {
+                    // Show dice when it's human's turn during MOVING state
+                    if (window.b.getGameState && window.b.getGameState() === window.b.STATES.MOVING) {
+                        const remainingDices = window.b.getBoard().getRemainingDices();
+                        update3DDice(remainingDices);
+                    }
+                    // Show message during THROWING_DICE
+                    if (window.b.getGameState && window.b.getGameState() === window.b.STATES.THROWING_DICE) {
+                        showHint('🎲 Player 1 starts! Roll the dice to begin!');
+                    }
+                }
+            });
+        }
+
+        // Make update3DDice globally available for the game
+        window.update3DDice = update3DDice;
+
+        // Make showHint globally available for the game
+        window.showHint = showHint;
+
+        // Make dice selection functions globally available
+        window.handleDiceClick = handleDiceClick;
+        window.updateDiceSelection = updateDiceSelection;
+
+        // Initialize 3D dice
+        document.addEventListener('DOMContentLoaded', () => {
+            init3DDice();
+            update3DDice([]);
+
+            // Add click handlers for dice
+            setTimeout(() => {
+                const dice1Canvas = document.getElementById('dice1-canvas');
+                const dice2Canvas = document.getElementById('dice2-canvas');
+                const dice1 = document.getElementById('dice1');
+                const dice2 = document.getElementById('dice2');
+
+                if (dice1Canvas) {
+                    dice1Canvas.addEventListener('click', () => handleDiceClick(0));
+                }
+                if (dice2Canvas) {
+                    dice2Canvas.addEventListener('click', () => handleDiceClick(1));
+                }
+                if (dice1) {
+                    dice1.addEventListener('click', () => handleDiceClick(0));
+                }
+                if (dice2) {
+                    dice2.addEventListener('click', () => handleDiceClick(1));
+                }
+            }, 2000);
+
+            // Show initial message
+            setTimeout(() => {
+                showHint('🎲 Player 1 starts! Roll the dice to begin!');
+            }, 1000);
+        });
     </script>
 </body>
 </html>

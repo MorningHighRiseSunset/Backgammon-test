@@ -57,16 +57,14 @@ var getPossibleDiceThrows = function() {
 }
   
 var stateChanged = function() {
-  console.log('STATE')
   // Not your turn!
   if (bg.getCurrentPlayer() != me) {
     return;
   }
-  
-  if (bg.getGameState() == bg.STATES.CHOOSE_STARTER || bg.getGameState() == bg.STATES.THROWING_DICE) {
+
+  if (bg.getGameState() == bg.STATES.THROWING_DICE) {
     throwDice();
   } else if (bg.getGameState() == bg.STATES.MOVING) {
-    console.log('state:', bg.getGameState())
     chooseMove();
   }
 }
@@ -189,7 +187,6 @@ var getMoveStrength = function (board, moves) {
   // Remember higher score is worse, so (before - after) should be higher for good moves
   var myDiff = (myScoreBefore - getBoardValue(board, me));
   var opDiff = (oppScoreBefore - getBoardValue(board, opponent))
-  console.log('diff', myDiff, opDiff, oppScoreBefore, getBoardValue(board, opponent), board.getPointsWithPlayer(board.WHITE));
   var scoreDiff = myDiff - opDiff;
   board.rollback();
   return scoreDiff;
@@ -204,29 +201,28 @@ var movesToString = function (moves) {
 }
 
 var chooseMove = function () {
-  console.log('about to choose move');
-  console.log('remaining dices', bg.getBoard().getRemainingDices());
   var tmpBoard = bg.getBoard().copy()
   var moves = getPossibleMoves(tmpBoard, me, bg.getBoard().getRemainingDices());
-  console.log(moves.length, 'moves to evaluate');
   var bestMoveScore = -10000;
   var bestMoves = [];
   for (var i=0; i < moves.length; i++){
     var strength = getMoveStrength(tmpBoard, moves[i]);
-    console.log(movesToString(moves[i]), strength)
     if (strength > bestMoveScore) {
       bestMoveScore = strength;
       bestMoves = moves[i];
     }
   }
-  console.log('best moves', movesToString(bestMoves), 'strength', bestMoveScore)
   bg.applyMoves(bestMoves);
 
 }
 
 var throwDice = function () {
-  console.log('computer is throwing dice');
-  bg.throwDice()
+  // Store flag to prevent 3D dice animation for AI
+  window.isAIRolling = true;
+  bg.throwDice();
+  setTimeout(() => {
+    window.isAIRolling = false;
+  }, 1500);
 }
 
 var runTests = function () {
@@ -240,7 +236,7 @@ var runTests = function () {
   if (res.length != expected.length) {
     console.log('getPermutations maxUniquqe failed', res, expected)
   }
-  
+
 //  console.log('hej', getPermutations([2,4,5,7,19,23], 4, 2).toString());
   var p = getPermutations([2,4,5,7,19,23], 2, 2);
   for (var i=0; i<p.length; i++) {

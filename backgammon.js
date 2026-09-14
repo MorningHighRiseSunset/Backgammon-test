@@ -193,7 +193,6 @@ var canMove = function (player) {
         for (var i=0; i < dices.length; i++) {
           var new_point = point + SIGN_MAP[player] * dices[i];
           if (isValidMove(point, new_point, player, dices)) {
-            console.log('can move from', point, new_point);
             return true;
           }
         }
@@ -201,7 +200,6 @@ var canMove = function (player) {
       }
     }
   }
-  console.log('cant move :(');
   return false;
 }
 
@@ -211,17 +209,17 @@ var isValidMove = function(from_point, to_point, player) {
   if (!getPiecesAtPoint(from_point).length) {
     return false;
   }
-  
+
   // Wrong color to move
   if ( getPlayerAtPoint(from_point) != player ) {
     return false;
   }
-  
+
   // Has piece out
   if ( hasPieceOut(player) && from_point != outPos(player)) {
     return false;
   }
-  
+
   // No dice corresponding to move
   var steps = getSteps(from_point, to_point, player);
   if ( dices.indexOf(steps) == -1 ) {
@@ -285,7 +283,7 @@ var move = function (from_point, to_point, player) {
   var moves = getMovesWhenMoving(from_point, to_point, player);
   for (var i=0; i < moves.length; i++) {
     _movePiece(moves[i][0], moves[i][1]);
-    
+
     // Play sound if an opponent's piece is moved to the bar
     if (moves[i][0] === to_point && moves[i][1] === outPos(swap(player))) {
       playBarSound();
@@ -293,13 +291,14 @@ var move = function (from_point, to_point, player) {
   }
   var steps = getSteps(from_point, to_point, player);
   useDice(steps);
-  return true; 
+  return true;
 }
 
 // Function to play sound when a piece is placed on the bar
 var playBarSound = function() {
-  var audio = new Audio('level-up-bonus-sequence-1-186890.mp3'); // Ensure this file is in the correct path
-  audio.play();
+  // Audio file is missing, commenting out
+  // var audio = new Audio('level-up-bonus-sequence-1-186890.mp3'); // Ensure this file is in the correct path
+  // audio.play();
 }
 
 var getMovesWhenMoving = function(from_point, to_point, player) {
@@ -348,11 +347,13 @@ var setDices = function(_dices) {
 }
 
 var useDice = function(diceValue) {
-  dices.splice(dices.indexOf(diceValue), 1);
+  var index = dices.indexOf(diceValue);
+  if (index > -1) {
+    dices.splice(index, 1);
+  }
 }
 
 var hasRemainingDices = function () {
-  console.log('hasre', dices.length > 0)
   return dices.length > 0;
 }
 
@@ -496,13 +497,12 @@ var loadState = function(state) {
   state = JSON.parse(state);
   currentPlayer = state.currentPlayer;
   gameState = state.gameState;
-  console.log('board', state.board)
   board = new BackGammonBoard(state.board);
   selectedPoint = state.selectedPoint;
-  
+
   redraw();
   stateChanged();
-  
+
 }
 
 var stateChanged = function () {
@@ -516,7 +516,6 @@ var stateChanged = function () {
 
 var undo = function () {
   if (previousStates) {
-    console.log('undoing');
     var prev = previousStates.slice(-2, -1);
     loadState(prev);
     previousStates = previousStates.slice(0, -2);
@@ -634,15 +633,16 @@ var winner = function () {
 }
 
 var autoMove = function () {
-  // sort remainingDices descending
-  var remainingDices = board.getRemainingDices().sort(function(a, b){return b-a;});
+  // Use remainingDices in their original order (not sorted)
+  var remainingDices = board.getRemainingDices();
   var new_point;
   for (var i=0; i < remainingDices.length; i++) {
     new_point = board.getToPoint(currentPlayer, selectedPoint, remainingDices[i]);
-    if (board.isValidMove(selectedPoint, new_point, currentPlayer, remainingDices)) {
+    if (board.isValidMove(selectedPoint, new_point, currentPlayer)) {
       return new_point;
     }
   }
+  return undefined; // Return undefined if no valid move found
 }
 
 var canSelectPoint = function (point) {
@@ -663,7 +663,6 @@ var switchPlayer = function() {
   selectPoint(undefined);
   gameState = STATES.THROWING_DICE;
   currentPlayer = swap(currentPlayer);
-  console.log('currentPlayer:', currentPlayer);
   stateChanged();
 }
 
@@ -797,18 +796,18 @@ var onMouseClick = function (ev) {
 
 
 var throwDice = function() {
-  // Array of audio file paths
-  var audioFiles = [
-    'dice-142528.mp3',
-    'rpg-dice-rolling-95182.mp3',
-    'rolling-dice-2-102706.mp3',
-    'gamemisc_dice-roll-on-wood_jaku5-37414.mp3'
-  ];
+  // Audio files are missing, commenting out audio playback
+  // var audioFiles = [
+  //   'dice-142528.mp3',
+  //   'rpg-dice-rolling-95182.mp3',
+  //   'rolling-dice-2-102706.mp3',
+  //   'gamemisc_dice-roll-on-wood_jaku5-37414.mp3'
+  // ];
 
-  // Randomly select an audio file
-  var randomIndex = Math.floor(Math.random() * audioFiles.length);
-  var audio = new Audio(audioFiles[randomIndex]);
-  audio.play();
+  // // Randomly select an audio file
+  // var randomIndex = Math.floor(Math.random() * audioFiles.length);
+  // var audio = new Audio(audioFiles[randomIndex]);
+  // audio.play();
 
   if (gameState === STATES.CHOOSE_STARTER) {
     var value = getRandomDiceThrow();
@@ -820,7 +819,10 @@ var throwDice = function() {
     } else {
       var lastDice = board.getRemainingDices()[0];
       if (value == lastDice) {
-        alert('you hit the same redo');
+        // Show in hint popup instead of alert
+        if (typeof showHint === 'function') {
+          showHint('You rolled the same number! Rolling again...');
+        }
         board.setDices([]);
         currentPlayer = board.WHITE;
       } else {
@@ -828,10 +830,8 @@ var throwDice = function() {
         // Black won
         if (value > lastDice) {
           currentPlayer = board.BLACK;
-          console.log('black won, black starts');
         } else {
           currentPlayer = board.WHITE;
-          console.log('white won, white starts');
         }
       }
     }
@@ -843,14 +843,18 @@ var throwDice = function() {
       board.setDices([dice1, dice1, dice1, dice1]);
     }
     gameState = STATES.MOVING;
-    
+
+    // Only update 3D dice when human player rolls (not AI)
+    if (currentPlayer == board.WHITE && typeof update3DDice === 'function') {
+      update3DDice(board.getRemainingDices());
+    }
+
     // If player can't move
     if (!board.canMove(currentPlayer)) {
-      console.log('cant move switch player');
       switchPlayer();
     }
   }
-  redraw();  
+  redraw();
   stateChanged();
 }
 
@@ -862,8 +866,7 @@ var applyMoves = function(moves) {
 var _move = function (fromPoint, toPoint, player) {
   board.move(fromPoint, toPoint, player);
   // Check if turn is done
-  if (!board.hasRemainingDices()) {          
-    console.log(player, ' is done switching');
+  if (!board.hasRemainingDices()) {
     switchPlayer();
   } else {
     if ( !board.canMove(currentPlayer) ) {
@@ -894,6 +897,12 @@ var pointClicked = function (point) {
     // Double click, select longest dice move as to
     if (selectedPoint === point) {
       point = autoMove();
+      // If autoMove returned undefined, don't try to move
+      if (point === undefined) {
+        selectPoint(undefined);
+        redraw();
+        return;
+      }
     }
 
     // valid move, move
@@ -908,13 +917,31 @@ var pointClicked = function (point) {
   }
 
   if (isGameOver()) {
-    alert('Congratulations ' + VANITY_MAP[winner()] + ' won the game!');
+    // Show in hint popup instead of alert
+    if (typeof showHint === 'function') {
+      showHint('🎉 Congratulations ' + VANITY_MAP[winner()] + ' won the game! 🎉');
+    }
   }
 }
 
 //------------------------------------------------------------------------------
 // Drawing functions
 //------------------------------------------------------------------------------
+
+// Helper function to draw rounded rectangle
+var drawRoundedRect = function(x, y, width, height, radius) {
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.lineTo(x + width - radius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + radius);
+  context.lineTo(x + width, y + height - radius);
+  context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  context.lineTo(x + radius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - radius);
+  context.lineTo(x, y + radius);
+  context.quadraticCurveTo(x, y, x + radius, y);
+  context.closePath();
+}
 var curBoard = function () {
   if (animationBoard) {
     return animationBoard;
@@ -923,68 +950,64 @@ var curBoard = function () {
 }
 
 var drawExtras = function () {
-
-  [board.WHITE, board.BLACK].forEach(function (player){
-    var xPos = 20;
-    var yPos = 10;
-    if ( player == board.WHITE ) {
-      yPos = conf.border * 1.5 + halfBoardHeight;
-    }
-    context.beginPath();
-    context.fillStyle = 'white';
-    context.fillText('Score: ' + curBoard().getPlayerScore(player), xPos, yPos);
-  })
-
+  // Score display removed as requested
+  // [board.WHITE, board.BLACK].forEach(function (player){
+  //   var xPos = 20;
+  //   var yPos = 10;
+  //   if ( player == board.WHITE ) {
+  //     yPos = conf.border * 1.5 + halfBoardHeight;
+  //   }
+  //   context.beginPath();
+  //   context.fillStyle = 'white';
+  //   context.fillText('Score: ' + curBoard().getPlayerScore(player), xPos, yPos);
+  // })
 }
 
 var drawRollButton = function() {
   if ( gameState == STATES.CHOOSE_STARTER || gameState == STATES.THROWING_DICE) {
-    context.beginPath();
-    context.rect(ROLL_BUTTON_X, ROLL_BUTTON_Y, ROLL_BUTTON_WIDTH, ROLL_BUTTON_HEIGHT);
-    context.fillStyle = 'black';
+    // Draw button background with brown gradient
+    var gradient = context.createLinearGradient(ROLL_BUTTON_X, ROLL_BUTTON_Y, ROLL_BUTTON_X, ROLL_BUTTON_Y + ROLL_BUTTON_HEIGHT);
+    gradient.addColorStop(0, '#D2691E');
+    gradient.addColorStop(1, '#8B4513');
+
+    drawRoundedRect(ROLL_BUTTON_X, ROLL_BUTTON_Y, ROLL_BUTTON_WIDTH, ROLL_BUTTON_HEIGHT, 8);
+    context.fillStyle = gradient;
     context.fill();
-    
+
+    // Add border
+    context.strokeStyle = '#5D4037';
+    context.lineWidth = 2;
+    context.stroke();
+
+    // Add shadow effect
+    context.shadowColor = 'rgba(93, 64, 55, 0.3)';
+    context.shadowBlur = 10;
+    context.shadowOffsetX = 2;
+    context.shadowOffsetY = 2;
+
     // Center both texts in the button
-    context.beginPath();
-    context.fillStyle = 'white';
-    // Center "Click" horizontally and position it 1/3 down from button top
+    context.fillStyle = '#F5DEB3';
+    context.font = 'bold 14px Arial';
     context.textAlign = 'center';
+    context.textBaseline = 'middle';
+
+    // Center "ROLL" horizontally and position it 1/3 down from button top
     context.fillText('ROLL', ROLL_BUTTON_X + (ROLL_BUTTON_WIDTH/2), ROLL_BUTTON_Y + (ROLL_BUTTON_HEIGHT/3));
-    // Center "Roll" horizontally and position it 2/3 down from button top
+    // Center "DICE" horizontally and position it 2/3 down from button top
     context.fillText('DICE', ROLL_BUTTON_X + (ROLL_BUTTON_WIDTH/2), ROLL_BUTTON_Y + (ROLL_BUTTON_HEIGHT * 2/3));
+
+    // Reset shadow
+    context.shadowColor = 'transparent';
+    context.shadowBlur = 0;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
   }
 }
 
 var drawDiceThrow = function() {
-  function showDice(context, xPos, yPos, size, value) {
-    var dotMap = {
-      1: [[0.5, 0.5]],
-      2: [[0.2, 0.8],[0.8, 0.2]],
-      3: [[0.2, 0.8],[0.8, 0.2],[0.5, 0.5]],
-      4: [[0.2, 0.8],[0.8, 0.2],[0.2, 0.2],[0.8, 0.8]],
-      5: [[0.2, 0.8],[0.8, 0.2],[0.2, 0.2],[0.8, 0.8],[0.5, 0.5]],
-      6: [[0.2, 0.8],[0.8, 0.2],[0.2, 0.2],[0.8, 0.8],[0.5, 0.2],[0.5, 0.8]],      
-    }
-    context.beginPath();
-    context.rect(xPos, yPos, size, size);
-    context.fillStyle = 'white';
-    context.lineStyle = 'black';
-    context.lineWidth = 1;
-    context.fill();
-    context.stroke();
-    for (var i=0; i<dotMap[value].length; i++) {
-      context.beginPath();
-      context.arc(xPos + dotMap[value][i][0] * size, yPos + dotMap[value][i][1] * size, size/10, 0, 2*Math.PI);
-      context.fillStyle = 'black';
-      context.fill();
-    }
-  }
-  var y = halfBoardHeight/2,
-      x = 3.5 * conf.border + halfBoardWidth;
-  for (var i=0; i < curBoard().getRemainingDices().length; i++) {
-    showDice(context, x, y, 30, curBoard().getRemainingDices()[i]);
-    x += 35;
-  }
+  // 2D dice drawing disabled - using 3D dice in HTML instead
+  // Only update 3D dice when dice are actually rolled (not on every redraw)
+  // The 3D dice update is handled in the throwDice function and state changes
 }
 var _drawPiece = function (x, y, player, selected) {
   context.beginPath();
@@ -1106,38 +1129,35 @@ var initDimensions = function () {
   pieceRadius = arrowWidth/2.4;
   ROLL_BUTTON_X = conf.border * 4;
   ROLL_BUTTON_Y = halfBoardHeight/2;
-  ROLL_BUTTON_HEIGHT = 30;
-  ROLL_BUTTON_WIDTH = 45;
+  ROLL_BUTTON_HEIGHT = 40;
+  ROLL_BUTTON_WIDTH = 80;
 };
 
 var initMisc = function () {
   playerTypeMap = conf.playerTypeMap;
-  console.log('playertypemap',playerTypeMap);
 }
 
 var loadConfig = function () {
-  console.log('conf', conf);
   if (conf.hasOwnProperty('border') !== true) {
     conf.border = 20
   };
   if (conf.hasOwnProperty('boardColor') !== true) {
-    conf.boardColor = "#b08968"; // Updated board color to #b08968
+    conf.boardColor = "#DEB887"; // Burlywood
   }
   if (conf.hasOwnProperty('playerTypeMap') !== true) {
       conf.playerTypeMap = {};
       conf.playerTypeMap[board.BLACK] = HUMAN;
       conf.playerTypeMap[board.WHITE] = HUMAN;
   }
-  conf.boardBorderColor = "#8a4b20";
-  conf.lightColor = "#EDE0D4"; // Light color for triangles
-  conf.darkColor = "#7F5539"; // Dark color for triangles
-  conf.colorMap = {'w':"#DDB892",'b':"#9C6644"}; // Light Beige for white checkers, Dark Brown for black checkers
+  conf.boardBorderColor = "#8B4513"; // SaddleBrown
+  conf.lightColor = "#FAEBD7"; // AntiqueWhite
+  conf.darkColor = "#CD853F"; // Peru
+  conf.colorMap = {'w':"#F5DEB3",'b':"#8B4513"}; // Wheat and SaddleBrown
 };
 
 var startGame = function() {
-  console.log('starting game');
-  gameState = STATES.CHOOSE_STARTER;
-  currentPlayer = board.WHITE;
+  gameState = STATES.THROWING_DICE; // Skip CHOOSE_STARTER, go directly to dice rolling
+  currentPlayer = board.WHITE; // Player 1 (WHITE) starts first
   redraw();
 }
 
