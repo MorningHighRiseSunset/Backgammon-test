@@ -796,18 +796,9 @@ var onMouseClick = function (ev) {
 
 
 var throwDice = function() {
-  // Audio files are missing, commenting out audio playback
-  // var audioFiles = [
-  //   'dice-142528.mp3',
-  //   'rpg-dice-rolling-95182.mp3',
-  //   'rolling-dice-2-102706.mp3',
-  //   'gamemisc_dice-roll-on-wood_jaku5-37414.mp3'
-  // ];
-
-  // // Randomly select an audio file
-  // var randomIndex = Math.floor(Math.random() * audioFiles.length);
-  // var audio = new Audio(audioFiles[randomIndex]);
-  // audio.play();
+  // Play dice roll sound
+  var audio = new Audio('dice-roll.mp3');
+  audio.play();
 
   if (gameState === STATES.CHOOSE_STARTER) {
     var value = getRandomDiceThrow();
